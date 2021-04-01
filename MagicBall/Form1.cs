@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace MagicBall
 {
@@ -16,6 +17,8 @@ namespace MagicBall
     {
         private const string APP_Name = "MAGIC_BALL";
         private readonly string PREDICTIONS_CONFIG_PATH = $"{Environment.CurrentDirectory}\\PredictionsConfig.json";
+        private string[] predictions;
+        Random random = new Random();
         public Form1()
         {
             InitializeComponent();
@@ -37,7 +40,9 @@ namespace MagicBall
                 }
             });
 
-            MessageBox.Show("message");
+            var index = random.Next(predictions.Length);
+
+            MessageBox.Show(predictions[index]);
 
             progressBar1.Value = 0;
 
@@ -67,6 +72,8 @@ namespace MagicBall
             try
             {
                 var date = File.ReadAllText(PREDICTIONS_CONFIG_PATH);
+
+                predictions = JsonConvert.DeserializeObject<string[]>(date);
             }
             catch(Exception ex)
             {
@@ -74,7 +81,15 @@ namespace MagicBall
             }
             finally
             {
-
+                if(predictions == null)
+                {
+                    Close();
+                }
+                else if(predictions.Length == 0)
+                {
+                    MessageBox.Show("Предсказание отсутствует");
+                    Close();
+                }
             }
         }
     }
